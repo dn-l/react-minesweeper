@@ -1,6 +1,6 @@
 # react-minesweeper 😵 💣 😎
 
-[Try online!](http://dn-l.github.io/react-minesweeper)
+[Try online!](https://dn-l.github.io/react-minesweeper/)
 
 React implementation of [Minesweeper Game](<https://en.wikipedia.org/wiki/Minesweeper_(video_game)>) optimized for large board.
 
@@ -21,6 +21,8 @@ If you find all bombs on the board (open all the hint cells), the button will op
 Feel free to put flags (🚩) with right mouse click for your convenience.
 
 To restart the game press the button again.
+
+Keep in mind, the game uses Javascript's random function for bombs distribution and is not optimized for situation when the number of bombs is close to the number of cells.
 
 ## Available Scripts
 
