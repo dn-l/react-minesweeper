@@ -7,7 +7,7 @@ import { ActionType, reducer, State } from "./GameContext";
 const params: GameParameters = {
   rows: 10,
   columns: 10,
-  bombs: 1,
+  mines: 1,
 };
 const initialState: State = {
   params,
@@ -15,7 +15,7 @@ const initialState: State = {
 };
 
 it(`sets state on ${ActionType.SetParams} action and creates new minesweeper instance`, () => {
-  const payload: GameParameters = { rows: 2, columns: 2, bombs: 2 };
+  const payload: GameParameters = { rows: 2, columns: 2, mines: 2 };
   const result = reducer(initialState, {
     type: ActionType.SetParams,
     payload,

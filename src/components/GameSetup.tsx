@@ -79,17 +79,17 @@ function GameSetup() {
 
         <div className="column">
           <div className="field">
-            <label className="label" htmlFor="bombs">
-              Bombs
+            <label className="label" htmlFor="mines">
+              Mines
             </label>
             <div className="control">
               <input
-                id="bombs"
-                name="bombs"
+                id="mines"
+                name="mines"
                 className="input"
                 autoComplete="off"
                 type="number"
-                value={formData?.bombs.toString()}
+                value={formData?.mines.toString()}
                 onChange={handleChange}
               />
             </div>

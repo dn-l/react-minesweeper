@@ -8,7 +8,7 @@ import Minesweeper, { GameParameters } from "../lib/Minesweeper";
 const initialParams: GameParameters = {
   rows: 1000,
   columns: 1000,
-  bombs: 20000,
+  mines: 20000,
 };
 const initialState: State = {
   params: initialParams,

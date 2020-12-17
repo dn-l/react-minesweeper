@@ -10,19 +10,19 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## How to play?
 
-Select the board parameters of your preference (number of rows, columns, and bombs), and press on a smile button to create a gaming board.
+Select the board parameters of your preference (number of rows, columns, and mines), and press on a smile button to create a gaming board.
 
-Select a cell and click on it. At this point, the bombs will be distributed through the board (so you don't lose the game with the first click).
+Select a cell and click on it. At this point, the mines will be distributed through the board (so you don't lose the game with the first click).
 
-Once you click on a bomb the board will open board cells, and the game will be lost (the button will indicate 😵)
+Once you click on a mine the board will open board cells, and the game will be lost (the button will indicate 😵)
 
-If you find all bombs on the board (open all the hint cells), the button will open the board calls as well, but the state of the button will show that you have won -- 😎
+If you find all mines on the board (open all the hint cells), the button will open the board calls as well, but the state of the button will show that you have won -- 😎
 
 Feel free to put flags (🚩) with right mouse click for your convenience.
 
 To restart the game press the button again.
 
-Keep in mind, the game uses Javascript's random function for bombs distribution and is not optimized for situation when the number of bombs is close to the number of cells.
+The game is not optimized for situation when the number of mines is higher than the number of empty cells.
 
 ## Available Scripts
 

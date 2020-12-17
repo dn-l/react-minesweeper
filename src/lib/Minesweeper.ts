@@ -1,12 +1,12 @@
 export interface GameParameters {
   rows: number;
   columns: number;
-  bombs: number;
+  mines: number;
 }
 
 export type CellCoordinates = number[];
 
-export const BOMB = -1;
+export const MINE = -1;
 export const OPENED = 0;
 
 export enum GameState {
@@ -17,53 +17,65 @@ export enum GameState {
 }
 
 // Possible values (numbers) that could be placed on the board:
-// -1 is a bomb
+// -1 is a mine
 // 0 is an open cell
-// everything lower than -1 is a hint of nearby bomb, example:
-//   -3 shows that there're 2 bombs nearby
-//   -2 shows that there's 1 bomb nearby
+// everything lower than -1 is a hint of nearby mine, example:
+//   -3 shows that there're 2 mines nearby
+//   -2 shows that there's 1 mine nearby
 // positive numbers show that the hint cell is opened, example:
-//    2 shows that there's 2 bombs nearby
+//    2 shows that there's 2 mines nearby
 
 class Minesweeper {
   state: GameState = GameState.NotStarted;
   board: number[][] = [];
-  private bombs: number = 0;
+  private mines: number = 0;
+  private rows: number = 0;
+  private columns: number = 0;
   private maxCol: number = 0;
   private maxRow: number = 0;
   private nearbyHidden: number = 0;
 
-  constructor({ rows, columns, bombs }: GameParameters) {
+  constructor({ rows, columns, mines }: GameParameters) {
+    this.rows = rows;
+    this.columns = columns;
     this.maxCol = columns - 1;
     this.maxRow = rows - 1;
-    const maxBombs = rows * columns - 1;
-    this.bombs = bombs > maxBombs ? maxBombs : bombs;
+    this.mines = this.getMaximumNumberOfMines({ rows, columns, mines });
   }
 
-  check([row, column]: CellCoordinates): GameState {
+  check(start: CellCoordinates): GameState {
+    const [row, column] = start;
+
     switch (this.state) {
       case GameState.Lost:
       case GameState.Won:
         break;
 
       case GameState.NotStarted:
-        this.distributeBombs(row, column);
+        this.distribute(start);
         this.state = GameState.Started;
-        this.openCells(row, column);
+        this.openCells(start);
         break;
 
       default:
-        if (this.board[row] !== undefined && this.board[row][column] === BOMB) {
+        if (this.board[row] !== undefined && this.board[row][column] === MINE) {
           this.state = GameState.Lost;
           return this.state;
         }
-        this.openCells(row, column);
+        this.openCells(start);
         break;
     }
     return this.state;
   }
 
-  private openCells(row: number, column: number) {
+  // http://www.minesweeper.info/custom.php
+  // The maximum number of mines is determined by ( x-1 )( y-1 )
+  private getMaximumNumberOfMines({ rows, columns, mines }: GameParameters) {
+    const maxMines = (rows - 1) * (columns - 1);
+    return Math.min(maxMines, mines);
+  }
+
+  private openCells([row, column]: CellCoordinates) {
     const queue: number[] = [row, column];
 
     let i: number;
@@ -76,7 +88,7 @@ class Minesweeper {
         this.board[i] = [];
       }
 
-      if (this.board[i][j] < BOMB) {
+      if (this.board[i][j] < MINE) {
         this.board[i][j] = this.board[i][j] * -1 - 1;
         this.nearbyHidden--;
         if (this.nearbyHidden === 0) {
@@ -92,7 +104,7 @@ class Minesweeper {
           i - 1 >= 0 &&
           (this.board[i - 1] === undefined ||
             this.board[i - 1][j] === undefined ||
-            this.board[i - 1][j] < BOMB)
+            this.board[i - 1][j] < MINE)
         ) {
           queue.push(i - 1, j);
         }
@@ -100,7 +112,7 @@ class Minesweeper {
           i + 1 <= this.maxRow &&
           (this.board[i + 1] === undefined ||
             this.board[i + 1][j] === undefined ||
-            this.board[i + 1][j] < BOMB)
+            this.board[i + 1][j] < MINE)
         ) {
           queue.push(i + 1, j);
         }
@@ -108,7 +120,7 @@ class Minesweeper {
           j - 1 >= 0 &&
           (this.board[i] === undefined ||
             this.board[i][j - 1] === undefined ||
-            this.board[i][j - 1] < BOMB)
+            this.board[i][j - 1] < MINE)
         ) {
           queue.push(i, j - 1);
         }
@@ -116,7 +128,7 @@ class Minesweeper {
           j + 1 <= this.maxCol &&
           (this.board[i] === undefined ||
             this.board[i][j + 1] === undefined ||
-            this.board[i][j + 1] < BOMB)
+            this.board[i][j + 1] < MINE)
         ) {
           queue.push(i, j + 1);
         }
@@ -124,29 +136,43 @@ class Minesweeper {
     }
   }
 
-  private distributeBombs(row: number, column: number) {
-    let bombsLeft = this.bombs;
-    let bombRow: number;
-    let bombColumn: number;
-    while (bombsLeft > 0) {
-      bombRow = Math.floor(Math.random() * this.maxRow);
-      bombColumn = Math.floor(Math.random() * this.maxCol);
+  private distribute(start: CellCoordinates) {
+    // if (this.rows * this.columns - this.mines < this.mines) {
+    //   this.distributeEmptyCells(start);
+    // } else {
+    this.distributeMines(start);
+    // }
+  }
+
+  private distributeEmptyCells(start: CellCoordinates) {
+    // TODO: implement bombs distribution when the number of bombs
+    //       is higher than the number of empty cells
+    throw new Error("Not implemented");
+  }
+
+  private distributeMines([row, column]: CellCoordinates) {
+    let minesLeft = this.mines;
+    let mineRow: number;
+    let mineColumn: number;
+    while (minesLeft > 0) {
+      mineRow = Math.floor(Math.random() * this.maxRow);
+      mineColumn = Math.floor(Math.random() * this.maxCol);
       if (
-        (bombRow === row && bombColumn === column) ||
-        (this.board[bombRow] !== undefined &&
-          this.board[bombRow][bombColumn] === BOMB)
+        (mineRow === row && mineColumn === column) ||
+        (this.board[mineRow] !== undefined &&
+          this.board[mineRow][mineColumn] === MINE)
       ) {
         continue;
       }
-      if (this.board[bombRow] === undefined) {
-        this.board[bombRow] = [];
+      if (this.board[mineRow] === undefined) {
+        this.board[mineRow] = [];
       }
-      if (this.board[bombRow][bombColumn] < BOMB) {
+      if (this.board[mineRow][mineColumn] < MINE) {
         this.nearbyHidden--;
       }
-      this.board[bombRow][bombColumn] = BOMB;
-      this.initNearbyCells([bombRow, bombColumn]);
-      bombsLeft--;
+      this.board[mineRow][mineColumn] = MINE;
+      this.initNearbyCells([mineRow, mineColumn]);
+      minesLeft--;
     }
   }
 
@@ -166,7 +192,7 @@ class Minesweeper {
           this.board[i] = [];
         }
         switch (this.board[i][j]) {
-          case BOMB:
+          case MINE:
             break;
           case undefined:
             this.board[i][j] = -2;

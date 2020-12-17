@@ -1,6 +1,6 @@
 import { CSSProperties, HTMLProps, useContext } from "react";
 import { GridChildComponentProps } from "react-window";
-import { BOMB, OPENED, GameState } from "../lib/Minesweeper";
+import { MINE, OPENED, GameState } from "../lib/Minesweeper";
 import GameContext from "./GameContext";
 
 export const CELL_SIZE = 50;
@@ -24,8 +24,6 @@ function Cell({
     state: { minesweeper },
   } = useContext(GameContext);
 
-  let className = "button";
-
   let val: undefined | number =
     minesweeper.board[rowIndex] && minesweeper.board[rowIndex][columnIndex];
   let body: undefined | string | number = val;
@@ -34,11 +32,8 @@ function Cell({
     minesweeper.state === GameState.Lost ||
     minesweeper.state === GameState.Won
   ) {
-    if (val === BOMB) {
-      body = "💣";
-    }
     switch (val) {
-      case BOMB:
+      case MINE:
         body = "💣";
         break;
       case OPENED:
@@ -47,17 +42,18 @@ function Cell({
         break;
 
       default:
-        if (val < BOMB) {
+        if (val < MINE) {
           body = val * -1 - 1;
         }
         break;
     }
   } else if (flag && (val < OPENED || val === undefined)) {
     body = "🚩";
-  } else if (val <= BOMB) {
+  } else if (val <= MINE) {
     body = undefined;
   } else if (val === OPENED) {
     body = undefined;
+  } else if (val > OPENED) {
   }
 
   return (
@@ -66,7 +62,7 @@ function Cell({
         data-row={rowIndex}
         data-column={columnIndex}
         style={CELL_STYLE}
-        className={className}
+        className="button"
         onClick={onClick}
         onContextMenu={onContextMenu}
         disabled={
