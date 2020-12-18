@@ -16,6 +16,8 @@ interface Flags {
   [row: number]: { [column: number]: boolean };
 }
 
+let numberOfFlags = 0;
+
 function Board() {
   const { ref, width, height } = useResizeObserver<HTMLDivElement>();
   const [flags, setFlags] = useState<Flags>({});
@@ -23,7 +25,10 @@ function Board() {
     state: { params, minesweeper },
     dispatch,
   } = useContext(GameContext);
-  useEffect(() => setFlags({}), [minesweeper]);
+  useEffect(() => {
+    setFlags({});
+    numberOfFlags = 0;
+  }, [minesweeper]);
   const handleClick: MouseEventHandler<HTMLButtonElement> = (e) => {
     const target: any = e.target;
     const [row, column] = getCoordinates(target);
@@ -39,6 +44,9 @@ function Board() {
   const handleContextMenu: MouseEventHandler<HTMLButtonElement> = (e) => {
     if (e.type === "contextmenu") {
       e.preventDefault();
+      if (numberOfFlags === params.mines) {
+        return;
+      }
       const newFlags = {
         ...flags,
       };
@@ -48,6 +56,7 @@ function Board() {
       }
       newFlags[row][column] = !newFlags[row][column];
       setFlags(newFlags);
+      numberOfFlags++;
     }
   };
 
