@@ -61,7 +61,11 @@ function Board() {
   };
 
   return (
-    <div ref={ref} className="container full-height">
+    <div
+      ref={ref}
+      className="container"
+      style={{ minHeight: 300, height: "100%" }}
+    >
       {width && height && (
         <FixedSizeGrid
           columnCount={params.columns}

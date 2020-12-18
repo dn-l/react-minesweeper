@@ -36,7 +36,7 @@ function Game() {
         <section>
           <GameSetup />
         </section>
-        <section className="is-flex-grow-1 pb-5">
+        <section className="pb-5" style={{ flex: 1 }}>
           <Board />
         </section>
       </div>
